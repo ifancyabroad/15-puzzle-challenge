@@ -2,9 +2,11 @@ class Puzzle {
 
   constructor(id, size) {
     this.puzzleContainer = document.querySelector(`#${id}`);
+    this.overlay = document.querySelector('#overlay');
+    this.restartButton = document.querySelector('#restart');
+    this.solved = false;
     this.size = size;
     this.solution = this.createSolution();
-    this.createModal();
     this.start();
     this.events();
   }
@@ -15,27 +17,22 @@ class Puzzle {
   }
 
   start() {
-    this.overlay.style.display = 'none';
-    this.grid = this.createGrid();
+    this.toggleModal();
+    let grid = this.createGrid();
+    while(!this.checkGrid(grid)) {
+      grid = this.createGrid();
+    }
+    this.grid = grid;
     this.renderGrid();
   }
 
-  createModal() {
-    // Create the modal to appear once the puzzle is solved
-    this.overlay = document.createElement('div');
-    this.overlay.classList.add('overlay');
-    this.overlay.style.display = 'none';
-    const modal = document.createElement('div');
-    modal.classList.add('modal');
-    const title = document.createElement('h1');
-    title.textContent = 'Congratulations!';
-    this.restartButton = document.createElement('button');
-    this.restartButton.textContent = 'Try Again';
-
-    document.body.appendChild(this.overlay);
-    this.overlay.appendChild(modal);
-    modal.appendChild(title);
-    modal.appendChild(this.restartButton);
+  toggleModal() {
+    // Toggle modal visibility
+    if (this.solved) {
+      this.overlay.classList.remove('hidden');
+    } else {
+      this.overlay.classList.add('hidden');
+    }
   }
 
   createSolution() {
@@ -73,8 +70,35 @@ class Puzzle {
         grid[i].push(tile[0]);
       }
     }
-
     return grid;
+  }
+
+  checkGrid(grid) {
+    // Check the grid is solvable
+
+    // Get the row number for the open space
+    const openPosition = this.getTilePosition(0, grid);
+    const evenRow = (openPosition.row + 1) % 2 === 0;
+    
+    // Get number of inversions
+    const tileList = [];
+    for (let row of grid) {
+      tileList.push(...row);
+    }
+
+    let inversions = 0;
+    for (let i = 0; i < tileList.length; i++) {
+      if (tileList[i] > 0 && tileList[i + 1] && tileList[i] > tileList[i + 1]) {
+        inversions++;
+      }
+    }
+    const evenInversions = inversions % 2 === 0;
+
+    if (evenRow && !evenInversions ||
+      !evenRow && evenInversions) {
+      return true;
+    }
+    console.log(tileList, inversions);
   }
 
   renderGrid() {
@@ -114,12 +138,12 @@ class Puzzle {
     }
   }
 
-  getTilePosition(tile) {
+  getTilePosition(tile, grid = this.grid) {
     // Get the row and column of a tile / number
     let position = {};
-    for (let row of this.grid) {
+    for (let row of grid) {
       if (row.findIndex(t => t === tile) > -1) {
-        position.row = this.grid.indexOf(row);
+        position.row = grid.indexOf(row);
         position.col = row.indexOf(tile);
         break;
       }
@@ -144,7 +168,8 @@ class Puzzle {
 
   checkSolved() {
     if (this.grid.toString() === this.solution.toString()) {
-      this.overlay.style.display = 'block';
+      this.solved = true;
+      this.toggleModal();
     }
   }
 

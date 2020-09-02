@@ -51,3 +51,7 @@ body {
   background-color: #fff;
   border-radius: 4px;
 }
+
+.hidden {
+  display: none;
+}
