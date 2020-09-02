@@ -1,3 +1,8 @@
+body {
+  font-family: arial, sans-serif;
+  margin: 0;
+}
+
 #puzzle {
   box-sizing: border-box;
   position: absolute;
@@ -18,7 +23,6 @@
 }
 
 #puzzle .tile {
-  font-family: arial, sans-serif;
   font-size: 18px;
   display: flex;
   justify-content: center;
@@ -26,4 +30,24 @@
   border: 1px solid #ccc;
   background-color: #ddd;
   cursor: pointer;
+}
+
+.overlay {
+  box-sizing: border-box;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+.modal {
+  box-sizing: border-box;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  padding: 24px;
+  background-color: #fff;
+  border-radius: 4px;
 }

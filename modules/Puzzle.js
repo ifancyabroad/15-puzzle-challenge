@@ -1,16 +1,58 @@
 class Puzzle {
 
   constructor(id, size) {
-    this.puzzleContainer = document.querySelector(`#${id}`)
+    this.puzzleContainer = document.querySelector(`#${id}`);
     this.size = size;
-    this.completed = false;
-    this.grid = this.createGrid();
-    this.renderGrid();
+    this.solution = this.createSolution();
+    this.createModal();
+    this.start();
     this.events();
   }
 
   events() {
     this.puzzleContainer.addEventListener('click', this.moveTile.bind(this));
+    this.restartButton.addEventListener('click', this.start.bind(this));
+  }
+
+  start() {
+    this.overlay.style.display = 'none';
+    this.grid = this.createGrid();
+    this.renderGrid();
+  }
+
+  createModal() {
+    // Create the modal to appear once the puzzle is solved
+    this.overlay = document.createElement('div');
+    this.overlay.classList.add('overlay');
+    this.overlay.style.display = 'none';
+    const modal = document.createElement('div');
+    modal.classList.add('modal');
+    const title = document.createElement('h1');
+    title.textContent = 'Congratulations!';
+    this.restartButton = document.createElement('button');
+    this.restartButton.textContent = 'Try Again';
+
+    document.body.appendChild(this.overlay);
+    this.overlay.appendChild(modal);
+    modal.appendChild(title);
+    modal.appendChild(this.restartButton);
+  }
+
+  createSolution() {
+    // Create solved puzzle grid
+    const grid = [];
+    let tile = 1;
+    for (let i = 0; i < this.size; i++) {
+      grid.push([]);
+      for (let ii = 0; ii < this.size; ii++) {
+        if (tile === (this.size * this.size)) {
+          tile = 0;
+        }
+        grid[i].push(tile);
+        tile++;
+      }
+    }
+    return grid;
   }
 
   createGrid() {
@@ -56,14 +98,18 @@ class Puzzle {
   }
 
   moveTile(event) {
+    // Find the tile that has been selected
     const tile = event.target.closest('.tile');
     if (tile) {
       const tileNumber = +tile.getAttribute('data-id');
       const move = this.findMove(tileNumber);
+
+      // Update the grid and re-render
       if (move) {
         this.grid[move.oldPosition.row][move.oldPosition.col] = 0;
         this.grid[move.newPosition.row][move.newPosition.col] = tileNumber;
         this.renderGrid();
+        this.checkSolved();
       }
     }
   }
@@ -93,6 +139,12 @@ class Puzzle {
       tilePosition.row - openPosition.row > -2 &&
       tilePosition.col === openPosition.col)) {
       return { oldPosition: tilePosition, newPosition: openPosition }
+    }
+  }
+
+  checkSolved() {
+    if (this.grid.toString() === this.solution.toString()) {
+      this.overlay.style.display = 'block';
     }
   }
 
