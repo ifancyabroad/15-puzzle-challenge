@@ -4,7 +4,6 @@ class Puzzle {
     this.puzzleContainer = document.querySelector(`#${id}`);
     this.overlay = document.querySelector('#overlay');
     this.restartButton = document.querySelector('#restart');
-    this.solved = false;
     this.size = size;
     this.solution = this.createSolution();
     this.start();
@@ -17,22 +16,23 @@ class Puzzle {
   }
 
   start() {
+    this.solved = false;
     this.toggleModal();
+
+    // Predefined grid for testing
+    // let grid = [
+    //   [1, 2, 3, 4],
+    //   [5, 6, 7, 8],
+    //   [9, 10, 11, 12],
+    //   [13, 14, 0, 15],
+    // ]
+
     let grid = this.createGrid();
     while(!this.checkGrid(grid)) {
       grid = this.createGrid();
     }
     this.grid = grid;
     this.renderGrid();
-  }
-
-  toggleModal() {
-    // Toggle modal visibility
-    if (this.solved) {
-      this.overlay.classList.remove('hidden');
-    } else {
-      this.overlay.classList.add('hidden');
-    }
   }
 
   createSolution() {
@@ -75,10 +75,11 @@ class Puzzle {
 
   checkGrid(grid) {
     // Check the grid is solvable
+    const evenGrid = this.size % 2 === 0;
 
-    // Get the row number for the open space
+    // Get the row number FROM THE TOP for the open space
     const openPosition = this.getTilePosition(0, grid);
-    const evenRow = (openPosition.row + 1) % 2 === 0;
+    const evenRow = (this.size - openPosition.row) % 2 === 0;
     
     // Get number of inversions
     const tileList = [];
@@ -94,11 +95,16 @@ class Puzzle {
     }
     const evenInversions = inversions % 2 === 0;
 
-    if (evenRow && !evenInversions ||
-      !evenRow && evenInversions) {
+    // Grid is solvable in the following circumstances
+    // Even sized grid:
+    // The blank is on an even row counting from the bottom (second-last, fourth-last, etc.) and number of inversions is odd.
+    // The blank is on an odd row counting from the bottom (last, third-last, fifth-last, etc.) and number of inversions is even.
+    // Odd sized grid:
+    // Number of inversions is even.
+    if (evenGrid && (evenRow && !evenInversions || !evenRow && evenInversions) ||
+      (!evenGrid && evenInversions)) {
       return true;
     }
-    console.log(tileList, inversions);
   }
 
   renderGrid() {
@@ -170,6 +176,15 @@ class Puzzle {
     if (this.grid.toString() === this.solution.toString()) {
       this.solved = true;
       this.toggleModal();
+    }
+  }
+
+  toggleModal() {
+    // Toggle modal visibility
+    if (this.solved) {
+      this.overlay.classList.remove('hidden');
+    } else {
+      this.overlay.classList.add('hidden');
     }
   }
 

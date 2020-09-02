@@ -3,12 +3,19 @@ body {
   margin: 0;
 }
 
-#puzzle {
-  box-sizing: border-box;
+h1 {
+  text-align: center;
+}
+
+.centered {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+}
+
+#puzzle {
+  box-sizing: border-box;
   display: flex;
   flex-wrap: wrap;
   height: 400px;
@@ -40,18 +47,25 @@ body {
   background-color: rgba(0, 0, 0, 0.6);
 }
 
+.hidden {
+  display: none;
+}
+
 .modal {
   box-sizing: border-box;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
   text-align: center;
   padding: 24px;
   background-color: #fff;
   border-radius: 4px;
 }
 
-.hidden {
-  display: none;
+@media (max-width: 420px) {
+  h1 {
+    font-size: 1.6rem;
+  }
+
+  #puzzle {
+    height: 300px;
+    width: 300px;
+  }
 }
