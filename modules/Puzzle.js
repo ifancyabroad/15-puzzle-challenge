@@ -57,38 +57,42 @@ class Puzzle {
 
   moveTile(event) {
     const tile = event.target.closest('.tile');
-    if (tile && this.findMove(tile)) {
-      console.log(tile);
+    if (tile) {
+      const tileNumber = +tile.getAttribute('data-id');
+      const move = this.findMove(tileNumber);
+      if (move) {
+        this.grid[move.oldPosition.row][move.oldPosition.col] = 0;
+        this.grid[move.newPosition.row][move.newPosition.col] = tileNumber;
+        this.renderGrid();
+      }
     }
   }
 
-  findMove(tile) {
-    // Find the tile and the open space in the grid
-    const tileNumber = +tile.getAttribute('data-id');
-    let tileGridIndex;
-    let tileRowIndex;
-    let openGridIndex;
-    let openRowIndex;
+  getTilePosition(tile) {
+    // Get the row and column of a tile / number
+    let position = {};
     for (let row of this.grid) {
-      if (row.findIndex(t => t === 0) > -1) {
-        openGridIndex = this.grid.indexOf(row);
-        openRowIndex = row.indexOf(0);
-      }
-      if (row.findIndex(t => t === tileNumber) > -1) {
-        tileGridIndex = this.grid.indexOf(row);
-        tileRowIndex = row.indexOf(tileNumber);
+      if (row.findIndex(t => t === tile) > -1) {
+        position.row = this.grid.indexOf(row);
+        position.col = row.indexOf(tile);
+        break;
       }
     }
+    return position;
+  }
 
+  findMove(tile) {
+    const tilePosition = this.getTilePosition(tile);
+    const openPosition = this.getTilePosition(0);
+    
     // Check if adjacent to the blank space
-    if (tileGridIndex === openGridIndex &&
-      tileRowIndex - openRowIndex < 2 &&
-      tileRowIndex - openRowIndex > -2) {
-      console.log('0 is left or right')
-    } else if (tileGridIndex - openGridIndex < 2 &&
-      tileGridIndex - openGridIndex > -2 &&
-      tileRowIndex === openRowIndex) {
-      console.log('0 i up or down');
+    if ((tilePosition.row === openPosition.row &&
+      tilePosition.col - openPosition.col < 2 &&
+      tilePosition.col - openPosition.col > -2) ||
+      (tilePosition.row - openPosition.row < 2 &&
+      tilePosition.row - openPosition.row > -2 &&
+      tilePosition.col === openPosition.col)) {
+      return { oldPosition: tilePosition, newPosition: openPosition }
     }
   }
 
