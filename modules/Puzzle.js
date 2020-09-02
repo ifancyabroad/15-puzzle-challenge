@@ -118,6 +118,8 @@ class Puzzle {
       for (let tile of row) {
         const tileNode = document.createElement('div');
         tileNode.setAttribute('data-id', tile);
+        tileNode.style.height = `calc(100% / ${this.size})`;
+        tileNode.style.width = `calc(100% / ${this.size})`;
         if (tile > 0) {
           tileNode.classList.add('tile');
           tileNode.textContent = tile;
